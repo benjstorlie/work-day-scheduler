@@ -2,7 +2,6 @@ let startHour = 8; // 8am
 let endHour = 18; // 6pm (the schedule goes up to but does not include 6pm)
 
 let currentDay = dayjs();
-let currentHour = currentDay.hour(); // currentHour type is Number.
 
 
 // Wrap all code that interacts with the DOM in a call to jQuery to ensure that the code isn't run until the browser has finished rendering all the elements in the html.
@@ -13,14 +12,16 @@ $(function () {
   const currentDayEl = $("#currentDay");
   const mainEl = $("#main");
 
+  // Display the current day.  currentDay is defined as dayjs() at the top
+  currentDayEl.text(currentDay.format("dddd, MMMM D"));
+
   // Do a for-loop to create the elements #hour-08 to #hour-17
   for (let h=startHour; h<endHour; h++) {
     //add to main element addTimeBlock(h);
     mainEl.append(addTimeBlock(h));
   }
 
-  // Display the current day.  currentDay is defined as dayjs() at the top
-  currentDayEl.text(currentDay.format("dddd, MMMM D"))
+  setInterval(updateTime,300000); // Runs every 5 minutes
 
 });
 
@@ -36,16 +37,12 @@ function addTimeBlock(h) {
     .attr("id","hour-"+h);
 
   // Add appropriate class to timeBlock depending on whether time h is in the past, present, or future.
-  // currentHour is defined as dayjs().hour() at the top.
   if (h == currentHour) {
     timeBlock.addClass("present");
   } else if (h < currentHour) {
     timeBlock.addClass("past");
   } else if (h > currentHour) {
     timeBlock.addClass("future");
-  } else {
-    // This should only happen if h or currentHour are not Number types, which shouldn't happen.
-    console.log("Error. h=" + h + ", currentHour="+currentHour)
   }
 
   // Define and append to the time block the other various html elements
@@ -80,3 +77,25 @@ function addTimeBlock(h) {
 
   return timeBlock;
 }
+
+function updateTime() {
+  // Update all the elements that depend on the current date and time
+
+  currentDay = dayjs();
+  $("#currentDay").text(currentDay.format("dddd, MMMM D"));
+
+  // This shows which of the time blocks shows the current hour, for example, currentIndex=0 means it is now 8AM.
+  let currentIndex = currentDay.hour() - startHour; 
+
+  const timeBlocks = $("time-block");
+  timeBlocks.removeclass("present").removeclass("past").removeClass("future");
+
+  timeBlocks.eq(currentIndex).addClass("present");
+  if (currentIndex !== 0) {
+    timeBlocks.slice(0,currentIndex).addClass("past");
+  }
+  if (currentIndex !==endHour) {
+    timeBlocks.slice(currentIndex).addClass("future");
+  }
+}
+
