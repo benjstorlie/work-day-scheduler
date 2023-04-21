@@ -2,7 +2,7 @@ let startHour = 8; // 8am
 let endHour = 18; // 6pm (the schedule goes up to but does not include 6pm)
 
 let currentDay = dayjs();
-
+let currentHour = dayjs().hour();
 
 // Wrap all code that interacts with the DOM in a call to jQuery to ensure that the code isn't run until the browser has finished rendering all the elements in the html.
 
